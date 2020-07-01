@@ -15,6 +15,21 @@ public class ProducerSb implements ProducerSbLocal {
     @Resource(mappedName = "jms/responseQueuePoolFactory")
     private ConnectionFactory responseQueuePoolFactory;
 
+    /**
+     * Create a TextMessage Message to put in the queue.
+     *
+     * @param session - The session created to access the JMS queue.
+     * @param secret - The secret to find in the file(s).
+     * @param appVersion - The version of the app.
+     * @param operationVersion - The version of the operation.
+     * @param tokenApp - The token of the application.
+     * @param tokenUser - The token of the user.
+     * @param path - The path of the file containing the secret message.
+     * @param key - The key to decrypt the file.
+     * @param confidence - The probability of the file to be in french.
+     * @return The newly created TextMessage.
+     * @throws JMSException The JMSException thrown if something goes wrong.
+     */
     private Message createJMSMessageForJmsResponseQueue(Session session, String secret, String appVersion,
                                                         String operationVersion, String tokenApp, String tokenUser,
                                                         String path, String key, String confidence) throws JMSException {
@@ -30,6 +45,19 @@ public class ProducerSb implements ProducerSbLocal {
         return tm;
     }
 
+    /**
+     * Send a Message to the jms/fileQueue.
+     *
+     * @param secret - The secret to find in the file(s).
+     * @param appVersion - The version of the app.
+     * @param operationVersion - The version of the operation.
+     * @param tokenApp - The token of the application.
+     * @param tokenUser - The token of the user.
+     * @param path - The path of the file containing the secret message.
+     * @param key - The key to decrypt the file.
+     * @param confidence - The probability of the file to be in french.
+     * @throws JMSException The JMSException thrown if something goes wrong.
+     */
     private void sendJmsMessageToResponseQueue(String secret, String appVersion, String operationVersion,
                                                String tokenApp, String tokenUser,String path, String key,
                                                String confidence) throws JMSException {
@@ -55,6 +83,19 @@ public class ProducerSb implements ProducerSbLocal {
         }
     }
 
+    /**
+     * Method used to call the methods above.
+     *
+     * @param secret - The secret to find in the file(s).
+     * @param appVersion - The version of the app.
+     * @param operationVersion - The version of the operation.
+     * @param tokenApp - The token of the application.
+     * @param tokenUser - The token of the user.
+     * @param path - The path of the file containing the secret message.
+     * @param key - The key to decrypt the file.
+     * @param confidence - The probability of the file to be in french.
+     * @throws JMSException The JMSException thrown if something goes wrong.
+     */
     @Override
     public void sendMessageToQueue(String secret, String appVersion, String operationVersion, String tokenApp,
                                    String tokenUser,String path, String key, String confidence) throws JMSException {

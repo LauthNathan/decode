@@ -18,6 +18,13 @@ public class DecodeService implements DecodeServiceLocal {
     DataSource dataSource;
     private final static String REGEX = "(?<=L'information secrète est : ).[^.]*";
 
+    /**
+     * Check if the file is a correct file in french language.
+     *
+     * @param content - The content of the file.
+     * @return true if it's a french document else false;
+     * @throws SQLException SQLException thrown if something goes wrong.
+     */
     @Override
     public boolean isFrench(String content) throws SQLException {
         ArrayList<String> dictionary = getDictionary();
@@ -25,11 +32,23 @@ public class DecodeService implements DecodeServiceLocal {
         return getConfidence(words, dictionary, 0.2);
     }
 
+    /**
+     * Search secret.
+     *
+     * @param content - The content of the file.
+     * @return The secret if exist.
+     */
     @Override
     public String searchSecret(String content) {
         return findSecret(content);
     }
 
+    /**
+     * Convert a byte array in a String to a String.
+     *
+     * @param content - The array byte corresponding to the content of the file.
+     * @return The content od the file.
+     */
     @Override
     public String byteToString(String content) {
         List<String> bits = Arrays.asList(content.split(","));
@@ -47,6 +66,12 @@ public class DecodeService implements DecodeServiceLocal {
         return newContent;
     }
 
+    /**
+     * Get the words from the database.
+     *
+     * @return The words from the database.
+     * @throws SQLException SQLException thrown if something goes wrong.
+     */
     private ArrayList<String> getDictionary() throws SQLException {
         ArrayList<String> stringArrayList = new ArrayList<>();
         java.sql.Connection conn = dataSource.getConnection();
@@ -59,6 +84,14 @@ public class DecodeService implements DecodeServiceLocal {
         return stringArrayList;
     }
 
+    /**
+     * Check if the file is in french language.
+     *
+     * @param words - The words from the file.
+     * @param dictionary - The words from the database.
+     * @param rate - The rate of error.
+     * @return true if superior to the given rate.
+     */
     private boolean getConfidence(List<String> words, ArrayList<String> dictionary, double rate) {
         if (words.size() < 5) {
             return false;
@@ -77,6 +110,12 @@ public class DecodeService implements DecodeServiceLocal {
         return wordsCount >= wordsToCount;
     }
 
+    /**
+     * Find the secret in the file.
+     *
+     * @param content - The content of the file.
+     * @return The secret if exist.
+     */
     private String findSecret(String content) {
         // Regex to find an email address
         Pattern p = Pattern.compile(REGEX);

@@ -21,6 +21,11 @@ public class ConsumerMDB implements MessageListener {
     @EJB
     private DecodeServiceLocal decodeService;
 
+    /**
+     * Method called when there is some message in the JMS queue.
+     *
+     * @param message - The message of the JMQ queue.
+     */
     @Override
     public void onMessage(Message message) {
         TextMessage textMessage = (TextMessage) message;
