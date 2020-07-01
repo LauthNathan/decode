@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 public class DecodeService implements DecodeServiceLocal {
     @Resource(lookup = "jdbc/words")
     DataSource dataSource;
-    private final static String REGEX = "(?<=L'information secrète est : ).*";
+    private final static String REGEX = "(?<=L'information secrète est : ).[^.]*";
 
     @Override
     public boolean isFrench(String content) throws SQLException {
@@ -28,6 +28,23 @@ public class DecodeService implements DecodeServiceLocal {
     @Override
     public String searchSecret(String content) {
         return findSecret(content);
+    }
+
+    @Override
+    public String byteToString(String content) {
+        List<String> bits = Arrays.asList(content.split(","));
+        byte[] byteArray = new byte[bits.size()];
+        for (int i = 0; i < bits.size(); i++) {
+            int bitValue = Integer.parseInt(bits.get(i));
+            if (bitValue > 127) {
+                bitValue = (256 - bitValue) * (-1);
+            }
+            byteArray[i] = (byte) bitValue;
+        }
+        String newContent = new String(byteArray);
+        newContent = newContent.replace("\u0000", "");
+        newContent = newContent.replace("\\u0000", "");
+        return newContent;
     }
 
     private ArrayList<String> getDictionary() throws SQLException {
@@ -43,19 +60,20 @@ public class DecodeService implements DecodeServiceLocal {
     }
 
     private boolean getConfidence(List<String> words, ArrayList<String> dictionary, double rate) {
+        if (words.size() < 5) {
+            return false;
+        }
         int wordsCount = 0;
-        String prevWord = "";
         int wordsLength = words.size();
         double wordsToCount = wordsLength * rate;
 
         for (String word : words) {
-            if (prevWord.equals(word.toLowerCase()) || dictionary.contains(word.toLowerCase())) {
+            if (dictionary.contains(word.toLowerCase())) {
                 wordsCount++;
             }
             if (wordsCount >= wordsToCount)
                 break;
         }
-
         return wordsCount >= wordsToCount;
     }
 

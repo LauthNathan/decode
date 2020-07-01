@@ -25,17 +25,20 @@ public class ConsumerMDB implements MessageListener {
     public void onMessage(Message message) {
         TextMessage textMessage = (TextMessage) message;
         try {
-            String fileContent = textMessage.getText();
+            String contentByte = textMessage.getText();
+            String fileContent = decodeService.byteToString(contentByte);
+
             String path = textMessage.getStringProperty("path");
             String key = textMessage.getStringProperty("key");
             String appVersion = textMessage.getStringProperty("appVersion");
             String operationVersion = textMessage.getStringProperty("operationVersion");
             String tokenApp = textMessage.getStringProperty("tokenApp");
             String tokenUser = textMessage.getStringProperty("tokenUser");
-
             if (decodeService.isFrench(fileContent)) {
                 String mySecret = decodeService.searchSecret(fileContent);
-                producerSb.sendMessageToQueue(mySecret, appVersion, operationVersion, tokenApp, tokenUser, path, key, "20");
+                if (!mySecret.equals("false")) {
+                    producerSb.sendMessageToQueue(mySecret, appVersion, operationVersion, tokenApp, tokenUser, path, key, "20");
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

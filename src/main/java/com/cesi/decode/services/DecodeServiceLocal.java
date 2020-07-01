@@ -7,4 +7,5 @@ import java.sql.SQLException;
 public interface DecodeServiceLocal {
     public boolean isFrench(String content) throws SQLException;
     public String searchSecret(String content);
+    public String byteToString(String content);
 }
